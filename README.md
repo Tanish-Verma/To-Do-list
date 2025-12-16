@@ -151,9 +151,8 @@ Planned features are documented in [`roadmap.md`](ROADMAP.md), including:
 
 ## Notes
 
-* Never commit `.env` files
-* Keep your `BOT_TOKEN` secret
 * SQLite file is auto-created on first run
+* This bot hasn't been deployed
 
 ---
 
