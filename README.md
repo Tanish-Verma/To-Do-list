@@ -31,7 +31,7 @@ Each user gets their own private task list with interactive buttons for a smooth
 
 * Async-first architecture
 * Supports **Polling** and **Webhook** modes
-* Works on platforms like **Render**, **Railway**, **PythonAnywhere**
+* Works with **Docker** and platforms like **Render**, **Railway**, **PythonAnywhere**
 
 ---
 
@@ -42,6 +42,7 @@ Each user gets their own private task list with interactive buttons for a smooth
 * **aiosqlite**
 * **SQLite**
 * **dotenv** (for local development)
+* **Docker / Docker Compose**
 
 ---
 
@@ -56,35 +57,38 @@ ToDoList/
 ├── tasks.db         # SQLite database (auto-created)
 ├── roadmap.md       # Planned future features
 ├── README.md
-└── .env             # Environment variables (not committed)
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+└── .env             # Environment variables 
 ```
 
 ---
 
-## Setup Instructions
+## Setup Instructions (Without Docker)
 
-### 1.Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone <your-repo-url>
 cd ToDoList
 ```
 
-### 2.Create a Virtual Environment
+### 2. Create a Virtual Environment
 
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/macOS
-venv\Scripts\activate     # Windows
+venv\\Scripts\\activate     # Windows
 ```
 
-### 3.Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4.Environment Variables
+### 4. Environment Variables
 
 Create a `.env` file:
 
@@ -92,16 +96,16 @@ Create a `.env` file:
 BOT_TOKEN=your_telegram_bot_token
 ```
 
-For webhook deployment (Render):
+For webhook deployment:
 
 ```env
-WEBHOOK_URL=https://your-app.onrender.com
+WEBHOOK_URL=https://your-app-domain
 PORT=8000
 ```
 
 ---
 
-## ▶Running the Bot
+## ▶ Running the Bot (Without Docker)
 
 ### Polling (Local Development)
 
@@ -113,6 +117,69 @@ python main.py
 
 * Uses `Application.run_webhook()`
 * Requires a public HTTPS URL
+
+---
+
+## 🐳 Running with Docker (Recommended)
+
+Docker provides a clean, reproducible environment and is recommended for deployment.
+
+### Prerequisites
+
+* Docker
+* Docker Compose (v2+)
+
+---
+
+### 1. Create `.env` File
+
+```env
+BOT_TOKEN=your_telegram_bot_token
+WEBHOOK_URL=https://your-app-domain
+PORT=8000
+```
+
+> ⚠️ `.env` is required at runtime and **must not be committed**.
+
+---
+
+### 2. Build and Run with Docker Compose
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+This will:
+
+* Build the Docker image
+* Start the bot container
+* Inject environment variables securely
+
+---
+
+### 3. Stop the Bot
+
+```bash
+docker compose down
+```
+
+---
+
+### 4. Database Persistence (Important)
+
+The SQLite database is persisted using a bind mount:
+
+```yaml
+volumes:
+  - ./tasks.db:/app/tasks.db
+```
+
+This ensures:
+
+* Tasks persist across restarts
+* Data is not lost when containers are recreated
 
 ---
 
@@ -131,28 +198,22 @@ python main.py
 
 ## Design Decisions
 
-* **Inline keyboards** used instead of numeric IDs → better UX
-* **SQLite** chosen for simplicity & portability
+* **Inline keyboards** instead of numeric IDs → better UX
+* **SQLite** for simplicity and portability
 * **Async DB access** to avoid blocking the event loop
-* **Confirmation dialogs** for destructive actions
+* **Docker volumes** for database persistence
+* **Runtime secrets injection** (no secrets in images)
 
 ---
 
 ## Future Enhancements
 
-Planned features are documented in [`roadmap.md`](ROADMAP.md), including:
+Planned features are documented in [`roadmap.md`](roadmap.md), including:
 
 * Due dates & reminders
 * Task priorities
 * Categories / tags
 * Bulk delete
-
----
-
-## Notes
-
-* SQLite file is auto-created on first run
-* This bot hasn't been deployed
 
 ---
 
@@ -166,5 +227,3 @@ MIT License — free to use, modify, and distribute.
 
 * [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
 * Telegram Bot API
-
----
