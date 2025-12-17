@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: to-dolist
+    env_file:
+      - .env
+    command: python main.py
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./tasks.db:/app/tasks.db
+      
+    restart: unless-stopped

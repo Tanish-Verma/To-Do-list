@@ -1,3 +1,4 @@
+tasks.db
 venv/
 .env
 __pycache__
