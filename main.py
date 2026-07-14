@@ -9,7 +9,8 @@ def main():
     load_dotenv()
 
     BOT_TOKEN = os.environ["BOT_TOKEN"]
-    WEBHOOK_URL = os.environ["WEBHOOK_URL"]
+    BOT_MODE = os.environ.get("BOT_MODE", "auto").lower()
+    WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
     PORT = int(os.environ.get("PORT", 8000))
 
     asyncio.run(db.init_db())
@@ -24,6 +25,20 @@ def main():
     application.add_handler(CommandHandler("clear", To_Do_List.clear))
     application.add_handler(CallbackQueryHandler(To_Do_List.clear_callback, pattern="^clear_"))
     application.add_handler(CallbackQueryHandler(To_Do_List.done_callback, pattern="^done:"))
+
+    if BOT_MODE == "polling":
+        application.run_polling()
+        return
+
+    if BOT_MODE not in {"auto", "webhook"}:
+        raise ValueError("BOT_MODE must be one of: auto, webhook, polling")
+
+    if not WEBHOOK_URL:
+        if BOT_MODE == "webhook":
+            raise ValueError("WEBHOOK_URL is required when BOT_MODE=webhook")
+
+        application.run_polling()
+        return
 
     application.run_webhook(
         listen="0.0.0.0",

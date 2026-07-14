@@ -94,11 +94,13 @@ Create a `.env` file:
 
 ```env
 BOT_TOKEN=your_telegram_bot_token
+BOT_MODE=auto
 ```
 
 For webhook deployment:
 
 ```env
+BOT_MODE=webhook
 WEBHOOK_URL=https://your-app-domain
 PORT=8000
 ```
@@ -113,9 +115,11 @@ PORT=8000
 python main.py
 ```
 
+If you want to force polling explicitly, set `BOT_MODE=polling`.
+
 ### Webhook (Production)
 
-* Uses `Application.run_webhook()`
+* Set `BOT_MODE=webhook` to force `Application.run_webhook()`
 * Requires a public HTTPS URL
 
 ---
